@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: openwebui-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: openwebui
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: openwebui
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  ollama:
+    image: ollama/ollama
+    container_name: llama3-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    restart: unless-stopped
+    entrypoint: >
+      sh -c "
+        ollama serve &
+        sleep 5 &&
+        ollama pull llama3 &&
+        tail -f /dev/null
+      "
+
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: openwebui
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - DATABASE_URL=postgresql://openwebui:secretpassword@postgres:5432/openwebui
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - HOST='0.0.0.0'
+    ports:
+      - "3000:8080"
+    depends_on:
+      - postgres
+      - ollama
+
+volumes:
+  postgres_data:
+  ollama_data:
+
