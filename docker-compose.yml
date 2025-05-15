@@ -3,8 +3,10 @@ version: '3.8'
 services:
   postgres:
     image: postgres:15
-    container_name: openwebui-postgres
+    container_name: postgres
     restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: openwebui
       POSTGRES_PASSWORD: secretpassword
@@ -14,7 +16,7 @@ services:
 
   ollama:
     image: ollama/ollama
-    container_name: llama3-ollama
+    container_name: ollama
     ports:
       - "11434:11434"
     volumes:
@@ -34,13 +36,18 @@ services:
     image: ghcr.io/open-webui/open-webui:main
     container_name: openwebui
     restart: unless-stopped
-    network_mode: host
     environment:
       - DATABASE_URL=postgresql://openwebui:secretpassword@postgres:5432/openwebui
       - OLLAMA_BASE_URL=http://ollama:11434
-      - HOST='0.0.0.0'
+      - HOST=0.0.0.0
+      - GLOBAL_LOG_LEVEL=DEBUG
+#      - HTTPX_LOG_LEVEL=DEBUG
+#      - LOG_LEVEL=DEBUG
+#      - LOGURU_LEVEL=DEBUG
     ports:
       - "3000:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - postgres
       - ollama
