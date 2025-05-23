@@ -29,6 +29,7 @@ services:
         ollama serve &
         sleep 5 &&
         ollama pull llama3 &&
+        ollama pull llava:7b &&
         tail -f /dev/null
       "
 
@@ -38,7 +39,8 @@ services:
     restart: unless-stopped
     environment:
       - DATABASE_URL=postgresql://openwebui:secretpassword@postgres:5432/openwebui
-      - OLLAMA_BASE_URL=http://ollama:11434
+#      - OLLAMA_BASE_URL=http://ollama:11434
+      - OLLAMA_BASE_URL=http://n8n:5678/
       - HOST=0.0.0.0
       - GLOBAL_LOG_LEVEL=DEBUG
 #      - HTTPX_LOG_LEVEL=DEBUG
@@ -82,7 +84,27 @@ services:
       - elasticsearch
     restart: unless-stopped
 
+  n8n:
+    image: n8nio/n8n
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=changeme
+      - TZ=Europe/Zurich
+      - GENERIC_TIMEZONE=Europe/Zurich
+      - N8N_HOST=localhost
+      - N8N_PORT=5678
+      - WEBHOOK_URL=http://localhost:5678
+      - N8N_SECURE_COOKIE=false
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   ollama_data:
   elastic_data:
+  n8n_data:
