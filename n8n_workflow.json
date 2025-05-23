@@ -1,0 +1,153 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "dadc6a91-8e15-483d-8b7e-1625b0824409",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        600,
+        -100
+      ],
+      "id": "d713cd21-2d27-4d3f-be47-de4a35ceb1f6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/api/generate",
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -100
+      ],
+      "id": "4345f138-f945-4035-b1c0-37ba9c35cfd3",
+      "name": "Webhook",
+      "webhookId": "dbd66f59-61df-4592-8f76-9ddb352174cd",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        -100
+      ],
+      "id": "d21431be-1571-445f-92b5-eac621611240",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "messages": {
+          "messageValues": [
+            {
+              "message": "Was ist ein pdf Archive?"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.6,
+      "position": [
+        180,
+        -100
+      ],
+      "id": "06bd98f4-f41c-4975-8d82-58acfca7b282",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "llava:7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        140
+      ],
+      "id": "ee72d470-2df4-48dc-ac3f-94249ef8b3e8",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "Pk4TnHOPZ5W8gogs",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        []
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e500796-f820-4bf5-b4a6-28abeb7abbe2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6eab9b8b09280048f3c2f2d4ad66566d0dd28b1b5f066eeab738f5df81528b61"
+  },
+  "id": "JXtHiIPMA0QA460X",
+  "tags": []
+}
