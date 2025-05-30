@@ -1,0 +1,156 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/api/generate",
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d7caabee-8389-41b3-8c52-8128512bc1eb",
+      "name": "Webhook",
+      "webhookId": "dbd66f59-61df-4592-8f76-9ddb352174cd",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "40ddbf10-e10f-4dac-8938-90815b3de012",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "model": "llama3:latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmOllama",
+      "typeVersion": 1,
+      "position": [
+        760,
+        220
+      ],
+      "id": "0fe37ee8-4395-40cb-b911-6d50d9df0b22",
+      "name": "Ollama Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ZBwrK50XAD62I8hz",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a7b0dd1f-f85e-4249-841f-5869e387c74a",
+              "name": "chatinput",
+              "value": "=gib alle bestellten Artikel aus:\n\n{{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        460,
+        0
+      ],
+      "id": "ee8461ae-c65e-4390-88af-acc7b2c4512b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "text": "={{ $('Extract from File').item.json.text }}",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"customer\": {\n    \"name\": \"\",\n    \"customerNumber\": \"\",\n    \"invoiceNumber\": \"\",\n    \"deliveryAddress\": \"\",\n    \"deliveryDate\": \"\",\n    \"contact\": \"\"\n  },\n  \"items\": [\n    {\n      \"articleNumber\": \"\",\n      \"description\": \"\",\n      \"category\": \"\",\n      \"quantity\": 0,\n      \"unit\": \"\",\n      \"unitPrice\": 0,\n      \"totalPrice\": 0\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1,
+      "position": [
+        780,
+        -40
+      ],
+      "id": "2ed305e7-5b76-44b7-84f4-1e2127e976f6",
+      "name": "Information Extractor"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "079bb756-9796-41d7-b94e-02997558e964",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "599d4514aaa923ca043c45edd351c4dedd27dc4c01f85f751f5c7222712ca2f2"
+  },
+  "id": "Nb3xC5TDarPJ4fts",
+  "tags": []
+}

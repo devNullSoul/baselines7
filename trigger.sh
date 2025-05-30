@@ -8,7 +8,7 @@ BASE=$(cat base64-data.txt)
 
 curl -X POST  http://localhost:5678/webhook-test/api/generate \
   -H "Content-Type: multipart/form-data" \
-  -F "data=@kurzepdf.pdf"
+  -F "data=@invoice.pdf"
 
 #curl -X POST http://localhost:5678/webhook-test/api/generate \
 #  -H "Content-Type: application/json" \
